@@ -1,19 +1,29 @@
 package app;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class DrawingPanel extends JComponent implements MouseListener, MouseMotionListener {
+public class DrawingPanel extends JPanel implements MouseListener, MouseMotionListener {
 
-	ArrayList<Shape> shapes = new ArrayList<>();
-	ArrayList<Color> shapeFill = new ArrayList<>();
-	ArrayList<Color> shapeStroke = new ArrayList<>();
+	ArrayList<Shape> shapeList = new ArrayList<>();
+	ArrayList<Color> fillColors = new ArrayList<>();
+	ArrayList<Color> strokeColors = new ArrayList<>();
 	ArrayList<Float> transValues = new ArrayList<>();
+	ArrayList<BasicStroke> strokeSizes = new ArrayList<>();
 
 	Point start, end;
 	UtilPaint util = new UtilPaint();
@@ -27,25 +37,28 @@ public class DrawingPanel extends JComponent implements MouseListener, MouseMoti
 
 	@Override
 	public void paint(Graphics g) {
+		super.paint(g);
 
 		Graphics2D settings = (Graphics2D) g;
 
 		settings.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		settings.setStroke(new BasicStroke(2));
+		settings.setStroke(new BasicStroke(Frame.stroke));
 
-		Iterator<Color> strokeCounters = shapeStroke.iterator();
-		Iterator<Color> fillCounters = shapeFill.iterator();
-		Iterator<Float> transCounters = transValues.iterator();
+		Iterator<Color> strokeColorsIte = strokeColors.iterator();
+		Iterator<Color> fillColorsIte = fillColors.iterator();
+		Iterator<Float> transValuesIte = transValues.iterator();
+		Iterator<BasicStroke> strokeSizesIte = strokeSizes.iterator();
 
 		settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
-		for (Shape s : shapes) {
+		for (Shape s : shapeList) {
 
-			settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transCounters.next()));
+			settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transValuesIte.next()));
 
-			settings.setPaint(strokeCounters.next());
+			settings.setPaint(strokeColorsIte.next());
+			settings.setStroke(strokeSizesIte.next());
 			settings.draw(s);
-			settings.setPaint(fillCounters.next());
+			settings.setPaint(fillColorsIte.next());
 			settings.fill(s);
 		}
 
@@ -109,13 +122,15 @@ public class DrawingPanel extends JComponent implements MouseListener, MouseMoti
 			case 4:
 
 				aShape = util.drawRectangle(start.x, start.y, e.getX(), e.getY());
+
 				break;
 
 			}
-			shapes.add(aShape);
-			shapeFill.add(Frame.fillColor);
-			shapeStroke.add(Frame.strokeColor);
+			shapeList.add(aShape);
+			fillColors.add(Frame.fillColor);
+			strokeColors.add(Frame.strokeColor);
 
+			strokeSizes.add(new BasicStroke(Frame.stroke));
 			transValues.add(Frame.transparency);
 
 			start = null;
@@ -132,9 +147,11 @@ public class DrawingPanel extends JComponent implements MouseListener, MouseMoti
 			Frame.strokeColor = Frame.fillColor;
 			aShape = util.drawBrush(e.getX(), e.getY(), Frame.stroke, Frame.stroke);
 
-			shapes.add(aShape);
-			shapeFill.add(Frame.fillColor);
-			shapeStroke.add(Frame.strokeColor);
+			shapeList.add(aShape);
+			fillColors.add(Frame.fillColor);
+			strokeColors.add(Frame.strokeColor);
+
+			strokeSizes.add(new BasicStroke(Frame.stroke));
 
 			transValues.add(Frame.transparency);
 		}

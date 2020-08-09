@@ -20,8 +20,7 @@ public class Frame extends JFrame {
 		this.setTitle("JAVA Paint");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		this.setVisible(true);
 
 	}
-
+	
 }

@@ -1,6 +1,6 @@
 package app;
 
-import java.awt.BorderLayout;
+import javax.swing.JPanel;
 
 public class App {
 
@@ -12,15 +12,14 @@ public class App {
 
 	public App() {
 
-		Controller.drawingPanel = new DrawingPanel();
+		JPanel draw = new DrawingPanel();
+		Controller con = new Controller(draw);
+		
+		Frame aFrame = new Frame(draw, new ButtonPanel(con), con);
 
-		Frame aFrame = new Frame();
-
-		aFrame.add(new TopMenu(), BorderLayout.NORTH);
-		aFrame.add(new ButtonPanel(), BorderLayout.SOUTH);
-		aFrame.add(Controller.drawingPanel, BorderLayout.CENTER);
 		aFrame.setVisible(true);
 
 	}
 
 }
+

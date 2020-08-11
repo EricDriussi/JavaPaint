@@ -1,15 +1,16 @@
 package app;
 
 import java.awt.Color;
-import java.awt.event.*;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 @SuppressWarnings("serial")
 public class ButtonPanel extends JPanel {
-
-	JButton brushBut, lineBut, ellipseBut, rectBut, strokeBut, fillBut;
 
 	JSlider transSlider = new JSlider(1, 99, 99);
 	JSlider strokeSlider = new JSlider(1, 99, 99);
@@ -19,16 +20,21 @@ public class ButtonPanel extends JPanel {
 
 	Box buttonBox = Box.createHorizontalBox();
 	Box transBox = Box.createVerticalBox();
+	Controller con;
 
-	public ButtonPanel() {
+	public ButtonPanel(Controller con) {
 
+		this.con = con;
+
+		buttonBox.add(makeIOBut("./src/download.png", true));
+		buttonBox.add(makeIOBut("./src/upload.png", false));
 		buttonBox.add(makeButton("./src/brush.png", 1, false));
-		buttonBox.add(makeButton("./src/line.png", 2, false));
-		buttonBox.add(makeButton("./src/ellipse.png", 3, false));
-		buttonBox.add(makeButton("./src/rectangle.png", 4, false));
+		buttonBox.add(makeButton("./src/pen.png", 2, false));
+		buttonBox.add(makeButton("./src/oval.png", 3, false));
+		buttonBox.add(makeButton("./src/square.png", 4, false));
 
-		buttonBox.add(makeButton("./src/stroke.png", 5, true));
-		buttonBox.add(makeButton("./src/fill.png", 6, true));
+		buttonBox.add(makeButton("./src/paint-palette.png", 5, true));
+		buttonBox.add(makeButton("./src/bucket.png", 6, true));
 
 		transSlider.addChangeListener(new ChangeListener() {
 
@@ -44,7 +50,7 @@ public class ButtonPanel extends JPanel {
 
 			}
 		});
-		
+
 		strokeSlider.addChangeListener(new ChangeListener() {
 
 			public void stateChanged(ChangeEvent e) {
@@ -77,6 +83,10 @@ public class ButtonPanel extends JPanel {
 		Icon ico = new ImageIcon(path);
 
 		but.setIcon(ico);
+		but.setMargin(new Insets(10, 10, 10, 10));
+		but.setOpaque(false);
+		but.setBackground(new Color(116, 143, 158));
+		but.setBorderPainted(true);
 		but.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -104,5 +114,36 @@ public class ButtonPanel extends JPanel {
 		});
 		return but;
 
+	}
+
+	private JButton makeIOBut(String path, boolean save) {
+
+		JButton but = new JButton();
+		Icon ico = new ImageIcon(path);
+
+		but.setMargin(new Insets(10, 10, 10, 10));
+		but.setIcon(ico);
+		but.setOpaque(false);
+		but.setBackground(new Color(116, 143, 158));
+		but.setBorderPainted(true);
+		ActionListener ls = (save) ? new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				con.saveImage();
+			}
+		} : new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				con.loadImage();
+			}
+		};
+
+		but.addActionListener(ls);
+
+		return but;
 	}
 }

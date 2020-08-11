@@ -5,6 +5,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -28,7 +29,12 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	Point start, end;
 	UtilPaint util = new UtilPaint();
 
+	public static Image image = null;
+	public static Boolean flag = false;
+
 	public DrawingPanel() {
+
+		this.setBackground(new Color(255, 255, 255));
 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
@@ -39,54 +45,63 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	public void paint(Graphics g) {
 		super.paint(g);
 
-		Graphics2D settings = (Graphics2D) g;
+		if (flag) {
+			this.setBackground(new Color(255, 255, 255));
+			g.drawImage(image, 0, 0, this);
+			flag = false;
+			shapeList = new ArrayList<>();
 
-		settings.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		settings.setStroke(new BasicStroke(Frame.stroke));
+		} else {
 
-		Iterator<Color> strokeColorsIte = strokeColors.iterator();
-		Iterator<Color> fillColorsIte = fillColors.iterator();
-		Iterator<Float> transValuesIte = transValues.iterator();
-		Iterator<BasicStroke> strokeSizesIte = strokeSizes.iterator();
+			Graphics2D settings = (Graphics2D) g;
+			g.drawImage(image, 0, 0, this);
 
-		settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+			settings.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			settings.setStroke(new BasicStroke(Frame.stroke));
 
-		for (Shape s : shapeList) {
+			Iterator<Color> strokeColorsIte = strokeColors.iterator();
+			Iterator<Color> fillColorsIte = fillColors.iterator();
+			Iterator<Float> transValuesIte = transValues.iterator();
+			Iterator<BasicStroke> strokeSizesIte = strokeSizes.iterator();
 
-			settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transValuesIte.next()));
+			settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
-			settings.setPaint(strokeColorsIte.next());
-			settings.setStroke(strokeSizesIte.next());
-			settings.draw(s);
-			settings.setPaint(fillColorsIte.next());
-			settings.fill(s);
-		}
+			for (Shape s : shapeList) {
 
-		if (start != null && end != null) {
-			settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+				settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, transValuesIte.next()));
 
-			settings.setPaint(Color.GRAY);
-
-			Shape aShape = null;
-
-			switch (Frame.currentBut) {
-			case 2:
-
-				aShape = util.drawLine(start.x, start.y, end.x, end.y);
-				break;
-
-			case 3:
-
-				aShape = util.drawEllipse(start.x, start.y, end.x, end.y);
-				break;
-
-			case 4:
-
-				aShape = util.drawRectangle(start.x, start.y, end.x, end.y);
-				break;
+				settings.setPaint(strokeColorsIte.next());
+				settings.setStroke(strokeSizesIte.next());
+				settings.draw(s);
+				settings.setPaint(fillColorsIte.next());
+				settings.fill(s);
 			}
-			settings.draw(aShape);
 
+			if (start != null && end != null) {
+				settings.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+
+				settings.setPaint(Color.GRAY);
+
+				Shape aShape = null;
+
+				switch (Frame.currentBut) {
+				case 2:
+
+					aShape = util.drawLine(start.x, start.y, end.x, end.y);
+					break;
+
+				case 3:
+
+					aShape = util.drawEllipse(start.x, start.y, end.x, end.y);
+					break;
+
+				case 4:
+
+					aShape = util.drawRectangle(start.x, start.y, end.x, end.y);
+					break;
+				}
+				settings.draw(aShape);
+			}
 		}
 
 	}

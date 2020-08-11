@@ -11,7 +11,8 @@ import javax.swing.JPanel;
 
 public class Controller {
 
-	JPanel drawingPanel;
+	private JPanel drawingPanel;
+	private JFileChooser fc = new JFileChooser(".");
 
 	public Controller(JPanel draw) {
 		drawingPanel = draw;
@@ -19,8 +20,6 @@ public class Controller {
 	}
 
 	public void saveImage() {
-
-		JFileChooser fc = new JFileChooser(".");
 
 		int returnVal = fc.showSaveDialog(drawingPanel);
 
@@ -44,7 +43,6 @@ public class Controller {
 	}
 
 	public void loadImage() {
-		JFileChooser fc = new JFileChooser(".");
 
 		int returnVal = fc.showOpenDialog(drawingPanel);
 
@@ -53,8 +51,7 @@ public class Controller {
 
 			try {
 				BufferedImage myPicture = ImageIO.read(file);
-				DrawingPanel.image = myPicture;
-				DrawingPanel.flag = true;
+				DrawingPanel.newImage = myPicture;
 				drawingPanel.repaint();
 
 			} catch (IOException ex) {

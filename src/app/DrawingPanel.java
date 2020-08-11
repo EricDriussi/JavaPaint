@@ -29,8 +29,8 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	Point start, end;
 	UtilPaint util = new UtilPaint();
 
-	public static Image image = null;
-	public static Boolean flag = false;
+	public static Image newImage = null;
+	Image baseImage = null;
 
 	public DrawingPanel() {
 
@@ -42,22 +42,23 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	}
 
 	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 
-		if (flag) {
+		if (newImage != null) {
 			this.setBackground(new Color(255, 255, 255));
-			g.drawImage(image, 0, 0, this);
-			flag = false;
+			g.drawImage(newImage, 0, 0, this);
+			baseImage = newImage;
+			newImage = null;
 			shapeList = new ArrayList<>();
 
 		} else {
 
 			Graphics2D settings = (Graphics2D) g;
-			g.drawImage(image, 0, 0, this);
+			g.drawImage(baseImage, 0, 0, this);
 
 			settings.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			settings.setStroke(new BasicStroke(Frame.stroke));
+			settings.setStroke(new BasicStroke(Frame.currentStroke));
 
 			Iterator<Color> strokeColorsIte = strokeColors.iterator();
 			Iterator<Color> fillColorsIte = fillColors.iterator();
@@ -145,8 +146,8 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 			fillColors.add(Frame.fillColor);
 			strokeColors.add(Frame.strokeColor);
 
-			strokeSizes.add(new BasicStroke(Frame.stroke));
-			transValues.add(Frame.transparency);
+			strokeSizes.add(new BasicStroke(Frame.currentStroke));
+			transValues.add(Frame.currentTrans);
 
 			start = null;
 			end = null;
@@ -160,15 +161,15 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
 			Shape aShape = null;
 			Frame.strokeColor = Frame.fillColor;
-			aShape = util.drawBrush(e.getX(), e.getY(), Frame.stroke, Frame.stroke);
+			aShape = util.drawBrush(e.getX(), e.getY(), Frame.currentStroke, Frame.currentStroke);
 
 			shapeList.add(aShape);
 			fillColors.add(Frame.fillColor);
 			strokeColors.add(Frame.strokeColor);
 
-			strokeSizes.add(new BasicStroke(Frame.stroke));
+			strokeSizes.add(new BasicStroke(Frame.currentStroke));
 
-			transValues.add(Frame.transparency);
+			transValues.add(Frame.currentTrans);
 		}
 
 		end = new Point(e.getX(), e.getY());

@@ -12,22 +12,72 @@ import javax.swing.event.ChangeListener;
 @SuppressWarnings("serial")
 public class ButtonPanel extends JPanel {
 
-	JSlider transSlider = new JSlider(1, 99, 99);
-	JSlider strokeSlider = new JSlider(1, 99, 99);
+	private JLabel labeTrans = new JLabel("Transparency: 1,00");;
+	private JLabel labeStroke = new JLabel("Stroke: 10,00");;
 
-	JLabel labe = new JLabel("Transparency: 1,00");;
-	JLabel labeStroke = new JLabel("Stroke: 10,00");;
-
-	Box buttonBox = Box.createHorizontalBox();
-	Box transBox = Box.createVerticalBox();
-	Controller con;
+	private Controller con;
 
 	public ButtonPanel(Controller con) {
 
 		this.con = con;
 
+		this.add(makeButBox());
+		this.add(makeSliderBox());
+	}
+
+	private Box makeSliderBox() {
+		Box sliderBox = Box.createVerticalBox();
+
+		sliderBox.add(labeTrans);
+		sliderBox.add(makeSlider(true));
+
+		sliderBox.add(labeStroke);
+		sliderBox.add(makeSlider(false));
+		
+		return sliderBox;
+	}
+
+	private JSlider makeSlider(boolean trans) {
+
+		JSlider out = new JSlider(1, 99, 99);
+
+		ChangeListener ls = (trans) ? new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+
+				if (e.getSource() == out) {
+
+					Frame.currentTrans = (float) (out.getValue() * .01);
+
+					labeTrans.setText("Transparency : " + String.format("%.1f", Frame.currentTrans));
+
+				}
+
+			}
+		} : new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+
+				if (e.getSource() == out) {
+
+					Frame.currentStroke = (float) (out.getValue() * .10);
+
+					labeStroke.setText("Stroke : " + String.format("%.2f", Frame.currentStroke));
+
+				}
+
+			}
+		};
+
+		out.addChangeListener(ls);
+		return out;
+
+	}
+
+	private Box makeButBox() {
+		Box buttonBox = Box.createHorizontalBox();
+		
 		buttonBox.add(makeIOBut("./src/download.png", true));
 		buttonBox.add(makeIOBut("./src/upload.png", false));
+		
 		buttonBox.add(makeButton("./src/brush.png", 1, false));
 		buttonBox.add(makeButton("./src/pen.png", 2, false));
 		buttonBox.add(makeButton("./src/oval.png", 3, false));
@@ -35,58 +85,14 @@ public class ButtonPanel extends JPanel {
 
 		buttonBox.add(makeButton("./src/paint-palette.png", 5, true));
 		buttonBox.add(makeButton("./src/bucket.png", 6, true));
-
-		transSlider.addChangeListener(new ChangeListener() {
-
-			public void stateChanged(ChangeEvent e) {
-
-				if (e.getSource() == transSlider) {
-
-					Frame.transparency = (float) (transSlider.getValue() * .01);
-
-					labe.setText("Transparency : " + String.format("%.1f", Frame.transparency));
-
-				}
-
-			}
-		});
-
-		strokeSlider.addChangeListener(new ChangeListener() {
-
-			public void stateChanged(ChangeEvent e) {
-
-				if (e.getSource() == strokeSlider) {
-
-					Frame.stroke = (float) (strokeSlider.getValue() * .10);
-
-					labeStroke.setText("Stroke : " + String.format("%.2f", Frame.stroke));
-
-				}
-
-			}
-		});
-
-		transBox.add(labe);
-		transBox.add(transSlider);
-
-		transBox.add(labeStroke);
-		transBox.add(strokeSlider);
-
-		this.add(buttonBox);
-
-		this.add(transBox);
+		
+		return buttonBox;
 	}
 
 	private JButton makeButton(String path, int button, boolean color) {
 
-		JButton but = new JButton();
-		Icon ico = new ImageIcon(path);
+		JButton but = basicButton(new JButton(), path);
 
-		but.setIcon(ico);
-		but.setMargin(new Insets(10, 10, 10, 10));
-		but.setOpaque(false);
-		but.setBackground(new Color(116, 143, 158));
-		but.setBorderPainted(true);
 		but.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -118,14 +124,8 @@ public class ButtonPanel extends JPanel {
 
 	private JButton makeIOBut(String path, boolean save) {
 
-		JButton but = new JButton();
-		Icon ico = new ImageIcon(path);
+		JButton but = basicButton(new JButton(), path);
 
-		but.setMargin(new Insets(10, 10, 10, 10));
-		but.setIcon(ico);
-		but.setOpaque(false);
-		but.setBackground(new Color(116, 143, 158));
-		but.setBorderPainted(true);
 		ActionListener ls = (save) ? new ActionListener() {
 
 			@Override
@@ -143,6 +143,18 @@ public class ButtonPanel extends JPanel {
 		};
 
 		but.addActionListener(ls);
+
+		return but;
+	}
+
+	private JButton basicButton(JButton but, String icon) {
+		Icon ico = new ImageIcon(icon);
+
+		but.setMargin(new Insets(10, 10, 10, 10));
+		but.setIcon(ico);
+		but.setOpaque(false);
+		but.setBackground(new Color(116, 143, 158));
+		but.setBorderPainted(true);
 
 		return but;
 	}
